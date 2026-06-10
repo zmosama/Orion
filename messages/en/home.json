@@ -1,1 +1,31 @@
-{}
+{
+  "home": {
+    "hero": {
+      "title": "Everything you need, under one sky",
+      "subtitle": "Shop electronics, home essentials, fashion and fitness — fast delivery and cash on delivery available.",
+      "cta": "Shop today's deals"
+    },
+    "shopNow": "Shop now",
+    "bestSellers": "Best Sellers",
+    "todaysDeals": "Today's Deals",
+    "newArrivals": "New Arrivals"
+  },
+  "category": {
+    "count": "{count, plural, one {# product} other {# products}}",
+    "empty": "No products in this category yet.",
+    "sort": {
+      "label": "Sort by",
+      "newest": "Newest arrivals",
+      "price-asc": "Price: Low to High",
+      "price-desc": "Price: High to Low",
+      "rating": "Avg. customer review"
+    }
+  },
+  "search": {
+    "results": "{count, plural, one {# result} other {# results}} for \"{query}\"",
+    "empty": "No results for \"{query}\"",
+    "emptyHint": "Check your spelling or try more general keywords.",
+    "prompt": "Type in the search bar above to find products.",
+    "browseHome": "Browse the homepage instead"
+  }
+}

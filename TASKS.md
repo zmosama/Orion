@@ -33,11 +33,12 @@
 
 ## Phase 2 — Agents (بالتوازي)
 
-### Agent A — الرئيسية والتصفح
-- [ ] `src/app/[locale]/page.tsx` — Hero + فئات + صفوف منتجات (أمازون-ستايل)
-- [ ] `src/app/[locale]/category/[slug]/page.tsx` — شبكة منتجات + فرز
-- [ ] `src/app/[locale]/search/page.tsx` — نتائج بحث
-- [ ] `src/components/home/*` + `messages/{en,ar}/home.json`
+### Agent A — الرئيسية والتصفح ✅
+> الأجينتس اصطدموا بحد الاستخدام (session limit بيتجدد 8:10 صباحاً) — Main كمّل الشغل inline.
+- [x] `src/app/[locale]/page.tsx` — Hero + فئات + صفوف منتجات (ISR 60s، SSG للغتين)
+- [x] `src/app/[locale]/category/[slug]/page.tsx` — شبكة منتجات + فرز (الأحدث/السعر/التقييم)
+- [x] `src/app/[locale]/search/page.tsx` — نتائج بحث (titleEn/titleAr/description/brand)
+- [x] `src/components/home/*` (HeroBanner + CategoryCardGrid من Agent A قبل القطع، ProductRow + SortSelect من Main) + `messages/{en,ar}/home.json`
 
 ### Agent B — صفحة المنتج
 - [ ] `src/app/[locale]/products/[slug]/page.tsx` — جاليري + تفاصيل + Buy Box
