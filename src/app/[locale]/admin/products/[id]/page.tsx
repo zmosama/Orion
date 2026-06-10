@@ -2,7 +2,14 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { getAdminSession } from "@/lib/admin";
-import { productImages, productSpecs } from "@/lib/catalog";
+import {
+  productImages,
+  productOptionTypes,
+  productSpecs,
+  variantLabel,
+  variantOptions,
+} from "@/lib/catalog";
+import { categoryTreeOptions } from "@/lib/admin-products";
 import ProductForm from "@/components/admin/ProductForm";
 
 function specsToLines(specs: Record<string, string>): string {
@@ -22,19 +29,37 @@ export default async function EditProductPage({
   const t = await getTranslations("admin.products");
 
   const [product, categories] = await Promise.all([
-    prisma.product.findUnique({ where: { id } }),
+    prisma.product.findUnique({ where: { id }, include: { variants: true } }),
     prisma.category.findMany({
-      select: { id: true, nameEn: true, nameAr: true },
+      select: { id: true, nameEn: true, nameAr: true, parentId: true },
       orderBy: { nameEn: "asc" },
     }),
   ]);
   if (!product) notFound();
 
+  // محاذاة أنواع الخيارات EN/AR بالترتيب لمحرر الفاريانتس
+  const typesEn = productOptionTypes(product, "en");
+  const typesAr = productOptionTypes(product, "ar");
+  const optionTypes = typesEn.map((o, i) => ({
+    nameEn: o.name,
+    nameAr: typesAr[i]?.name ?? "",
+    values: o.values.map((v, j) => ({ en: v, ar: typesAr[i]?.values[j] ?? "" })),
+  }));
+
+  const variantRows = product.variants.map((v) => ({
+    id: v.id,
+    comboEn: variantOptions(v, "en"),
+    comboAr: variantOptions(v, "ar"),
+    labelEn: variantLabel(v, "en"),
+    price: v.price !== null ? String(v.price) : "",
+    stock: String(v.stock),
+  }));
+
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-bold text-gray-900">{t("editTitle")}</h1>
       <ProductForm
-        categories={categories}
+        categories={categoryTreeOptions(categories)}
         initial={{
           id: product.id,
           slug: product.slug,
@@ -51,6 +76,8 @@ export default async function EditProductPage({
           specsEnText: specsToLines(productSpecs(product, "en")),
           specsArText: specsToLines(productSpecs(product, "ar")),
           featured: product.featured,
+          optionTypes,
+          variantRows,
         }}
       />
     </div>

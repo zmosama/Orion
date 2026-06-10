@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
-import { productSchema, toProductData } from "@/lib/admin-products";
+import { productSchema, syncVariants, toProductData } from "@/lib/admin-products";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -20,7 +20,10 @@ export async function PATCH(req: Request, { params }: Ctx) {
   if (slugTaken) return NextResponse.json({ error: "SLUG_EXISTS" }, { status: 409 });
 
   try {
-    await prisma.product.update({ where: { id }, data: toProductData(parsed.data) });
+    await prisma.$transaction(async (tx) => {
+      await tx.product.update({ where: { id }, data: toProductData(parsed.data) });
+      await syncVariants(tx, id, parsed.data.variants);
+    });
   } catch {
     return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
   }

@@ -15,7 +15,9 @@ export default async function Header() {
 
   let categories: { id: string; slug: string; nameEn: string; nameAr: string }[] = [];
   try {
+    // الفئات الرئيسية بس في شريط التنقل — الفرعية بتظهر جوه صفحة الفئة
     categories = await prisma.category.findMany({
+      where: { parentId: null },
       select: { id: true, slug: true, nameEn: true, nameAr: true },
       orderBy: { nameEn: "asc" },
     });

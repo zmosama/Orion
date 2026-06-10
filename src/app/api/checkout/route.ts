@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
-import { cancelOrder, createOrderWithReservation, OutOfStockError } from "@/lib/stock";
+import {
+  cancelOrder,
+  createOrderWithReservation,
+  OutOfStockError,
+  VariantRequiredError,
+} from "@/lib/stock";
 import { initiatePayment } from "@/lib/payments";
 import { clientIp, rateLimit } from "@/lib/ratelimit";
 import { GOVERNORATES, MAX_QTY_PER_ITEM, PaymentMethod } from "@/lib/constants";
@@ -11,6 +16,7 @@ const schema = z.object({
     .array(
       z.object({
         productId: z.string().min(1),
+        variantId: z.string().min(1).nullable().optional(),
         qty: z.number().int().min(1).max(MAX_QTY_PER_ITEM),
       }),
     )
@@ -62,6 +68,12 @@ export async function POST(req: Request) {
       return NextResponse.json(
         { error: e.localizedMessage(locale), code: "OUT_OF_STOCK" },
         { status: 409 },
+      );
+    }
+    if (e instanceof VariantRequiredError) {
+      return NextResponse.json(
+        { error: e.localizedMessage(locale), code: "VARIANT_REQUIRED" },
+        { status: 400 },
       );
     }
     console.error("checkout error:", e);

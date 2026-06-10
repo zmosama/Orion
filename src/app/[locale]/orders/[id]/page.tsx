@@ -109,12 +109,19 @@ export default async function OrderDetailPage({ params, searchParams }: Props) {
                   className="object-contain"
                 />
               </span>
-              <Link
-                href={`/products/${item.product.slug}`}
-                className="line-clamp-2 flex-1 text-gray-800 hover:text-orion-link"
-              >
-                {locale === "ar" ? item.titleAr : item.titleEn}
-              </Link>
+              <span className="min-w-0 flex-1">
+                <Link
+                  href={`/products/${item.product.slug}`}
+                  className="line-clamp-2 block text-gray-800 hover:text-orion-link"
+                >
+                  {locale === "ar" ? item.titleAr : item.titleEn}
+                </Link>
+                {(locale === "ar" ? item.variantLabelAr : item.variantLabelEn) ? (
+                  <span className="block text-xs text-gray-500">
+                    {locale === "ar" ? item.variantLabelAr : item.variantLabelEn}
+                  </span>
+                ) : null}
+              </span>
               <span className="text-gray-600">×{item.qty}</span>
               <span className="font-semibold text-gray-900">
                 {formatEGP(item.price * item.qty, locale)}

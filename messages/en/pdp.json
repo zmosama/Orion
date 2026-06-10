@@ -6,6 +6,7 @@
     "listPrice": "List price",
     "aboutItem": "About this item",
     "qty": "Qty:",
+    "comboUnavailable": "This combination is unavailable",
     "freeShippingNote": "FREE shipping on orders over {amount}",
     "trustShipping": "Fast home delivery",
     "trustSecure": "Secure transaction",

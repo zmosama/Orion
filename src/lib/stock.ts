@@ -1,4 +1,5 @@
 import { prisma } from "./prisma";
+import { variantLabel } from "./catalog";
 import {
   OrderStatus,
   PaymentMethod,
@@ -11,6 +12,22 @@ import {
   type OrderStatusType,
 } from "./constants";
 import type { Prisma } from "@prisma/client";
+
+export class VariantRequiredError extends Error {
+  constructor(
+    public titleEn: string,
+    public titleAr: string,
+  ) {
+    super(`"${titleEn}" requires choosing options (size/color…)`);
+    this.name = "VariantRequiredError";
+  }
+
+  localizedMessage(locale: string): string {
+    return locale === "ar"
+      ? `"${this.titleAr}" محتاج تختار الخيارات بتاعته (مقاس/لون…)`
+      : this.message;
+  }
+}
 
 export class OutOfStockError extends Error {
   constructor(
@@ -39,6 +56,8 @@ export class OutOfStockError extends Error {
 
 export interface CheckoutItem {
   productId: string;
+  /** مطلوب للمنتجات اللي ليها variants (مقاسات/ألوان…) */
+  variantId?: string | null;
   qty: number;
 }
 
@@ -78,11 +97,20 @@ export async function createOrderWithReservation(opts: {
     });
     const byId = new Map(products.map((p) => [p.id, p]));
 
+    const variantIds = items.map((i) => i.variantId).filter((v): v is string => Boolean(v));
+    const variants = variantIds.length
+      ? await tx.productVariant.findMany({ where: { id: { in: variantIds } } })
+      : [];
+    const variantById = new Map(variants.map((v) => [v.id, v]));
+
     let subtotal = 0;
     const orderItems: {
       productId: string;
+      variantId?: string;
       titleEn: string;
       titleAr: string;
+      variantLabelEn?: string;
+      variantLabelAr?: string;
       price: number;
       qty: number;
     }[] = [];
@@ -92,25 +120,55 @@ export async function createOrderWithReservation(opts: {
       if (!product) throw new Error("منتج غير موجود في السلة");
       const qty = Math.max(1, Math.min(MAX_QTY_PER_ITEM, Math.floor(item.qty)));
 
-      // الخصم الذرّي المشروط — هنا بتتحسم عدالة آخر قطعة
-      const res = await tx.product.updateMany({
-        where: { id: product.id, stock: { gte: qty } },
-        data: { stock: { decrement: qty } },
-      });
-      if (res.count === 0) {
-        const current = await tx.product.findUnique({
-          where: { id: product.id },
-          select: { stock: true },
-        });
-        throw new OutOfStockError(product.titleEn, product.titleAr, current?.stock ?? 0);
+      const variant = item.variantId ? variantById.get(item.variantId) : undefined;
+      // منتج ليه variants لازم يتطلب بتركيبة محددة — ومايتقبلش variant من منتج تاني
+      if (product.hasVariants && (!variant || variant.productId !== product.id)) {
+        throw new VariantRequiredError(product.titleEn, product.titleAr);
       }
 
-      subtotal += product.price * qty;
+      if (variant) {
+        // الخصم الذرّي على مستوى الفاريانت — عدالة آخر قطعة لكل تركيبة
+        const res = await tx.productVariant.updateMany({
+          where: { id: variant.id, stock: { gte: qty } },
+          data: { stock: { decrement: qty } },
+        });
+        if (res.count === 0) {
+          const current = await tx.productVariant.findUnique({
+            where: { id: variant.id },
+            select: { stock: true },
+          });
+          throw new OutOfStockError(product.titleEn, product.titleAr, current?.stock ?? 0);
+        }
+        // إجمالي ستوك المنتج يفضل متزامن (للعرض في الكروت)
+        await tx.product.update({
+          where: { id: product.id },
+          data: { stock: { decrement: qty } },
+        });
+      } else {
+        // الخصم الذرّي المشروط — هنا بتتحسم عدالة آخر قطعة
+        const res = await tx.product.updateMany({
+          where: { id: product.id, stock: { gte: qty } },
+          data: { stock: { decrement: qty } },
+        });
+        if (res.count === 0) {
+          const current = await tx.product.findUnique({
+            where: { id: product.id },
+            select: { stock: true },
+          });
+          throw new OutOfStockError(product.titleEn, product.titleAr, current?.stock ?? 0);
+        }
+      }
+
+      const unitPrice = variant?.price ?? product.price;
+      subtotal += unitPrice * qty;
       orderItems.push({
         productId: product.id,
+        variantId: variant?.id,
         titleEn: product.titleEn,
         titleAr: product.titleAr,
-        price: product.price,
+        variantLabelEn: variant ? variantLabel(variant, "en") : undefined,
+        variantLabelAr: variant ? variantLabel(variant, "ar") : undefined,
+        price: unitPrice,
         qty,
       });
     }
@@ -142,6 +200,13 @@ export async function createOrderWithReservation(opts: {
 async function restockOrderItems(tx: Tx, orderId: string) {
   const items = await tx.orderItem.findMany({ where: { orderId } });
   for (const item of items) {
+    // إرجاع لستوك الفاريانت (لو لسه موجود) + إجمالي المنتج دايماً
+    if (item.variantId) {
+      await tx.productVariant.updateMany({
+        where: { id: item.variantId },
+        data: { stock: { increment: item.qty } },
+      });
+    }
     await tx.product.update({
       where: { id: item.productId },
       data: { stock: { increment: item.qty } },

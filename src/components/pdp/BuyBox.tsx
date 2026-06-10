@@ -5,7 +5,7 @@ import { Banknote, ShieldCheck, Truck } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useCart } from "@/components/cart/CartProvider";
-import AddToCartButton from "@/components/product/AddToCartButton";
+import AddToCartButton, { type CartVariant } from "@/components/product/AddToCartButton";
 import { formatEGP } from "@/lib/money";
 import { FREE_SHIPPING_THRESHOLD, MAX_QTY_PER_ITEM } from "@/lib/constants";
 
@@ -17,10 +17,35 @@ export interface BuyBoxProduct {
   price: number;
   image: string;
   stock: number;
+  hasVariants: boolean;
 }
 
-/** صندوق الشراء — السعر والتوفر والكمية وأزرار الشراء (يمين الصفحة زي أمازون) */
-export default function BuyBox({ product }: { product: BuyBoxProduct }) {
+export interface BuyBoxOption {
+  nameEn: string;
+  nameLocalized: string;
+  values: { en: string; localized: string }[];
+}
+
+export interface BuyBoxVariant {
+  id: string;
+  optionsEn: Record<string, string>;
+  labelEn: string;
+  labelAr: string;
+  price: number | null;
+  stock: number;
+  image?: string | null;
+}
+
+/** صندوق الشراء — السعر والتوفر والكمية وأزرار الشراء + اختيار المقاس/اللون */
+export default function BuyBox({
+  product,
+  options = [],
+  variants = [],
+}: {
+  product: BuyBoxProduct;
+  options?: BuyBoxOption[];
+  variants?: BuyBoxVariant[];
+}) {
   const locale = useLocale();
   const t = useTranslations("pdp");
   const tc = useTranslations("common");
@@ -28,18 +53,44 @@ export default function BuyBox({ product }: { product: BuyBoxProduct }) {
   const { addItem } = useCart();
   const [qty, setQty] = useState(1);
 
-  const max = Math.min(MAX_QTY_PER_ITEM, product.stock);
+  // الاختيار المبدئي: أول تركيبة متاحة
+  const initial = variants.find((v) => v.stock > 0) ?? variants[0];
+  const [selected, setSelected] = useState<Record<string, string>>(initial?.optionsEn ?? {});
+
+  const current = product.hasVariants
+    ? (variants.find((v) => options.every((o) => v.optionsEn[o.nameEn] === selected[o.nameEn])) ??
+      null)
+    : null;
+
+  const cartVariant: CartVariant | null = current
+    ? {
+        id: current.id,
+        labelEn: current.labelEn,
+        labelAr: current.labelAr,
+        price: current.price,
+        stock: current.stock,
+        image: current.image,
+      }
+    : null;
+
+  const stock = product.hasVariants ? (current?.stock ?? 0) : product.stock;
+  const price = current?.price ?? product.price;
+  const max = Math.min(MAX_QTY_PER_ITEM, Math.max(stock, 1));
+  const comboMissing = product.hasVariants && !current;
 
   function buyNow() {
     addItem(
       {
         productId: product.id,
+        variantId: cartVariant?.id,
         slug: product.slug,
         titleEn: product.titleEn,
         titleAr: product.titleAr,
-        price: product.price,
-        image: product.image,
-        stock: product.stock,
+        variantLabelEn: cartVariant?.labelEn,
+        variantLabelAr: cartVariant?.labelAr,
+        price,
+        image: cartVariant?.image || product.image,
+        stock,
       },
       qty,
     );
@@ -48,34 +99,67 @@ export default function BuyBox({ product }: { product: BuyBoxProduct }) {
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-4">
-      <p className="text-2xl font-bold text-gray-900">{formatEGP(product.price, locale)}</p>
+      <p className="text-2xl font-bold text-gray-900">{formatEGP(price, locale)}</p>
 
       <p className="mt-1 text-xs text-gray-600">
         {t("freeShippingNote", { amount: formatEGP(FREE_SHIPPING_THRESHOLD, locale) })}
       </p>
 
+      {/* اختيار المقاس/اللون/الوزن */}
+      {options.map((option) => (
+        <div key={option.nameEn} className="mt-3">
+          <p className="text-sm font-semibold text-gray-800">
+            {option.nameLocalized}:{" "}
+            <span className="font-normal text-gray-600">
+              {option.values.find((v) => v.en === selected[option.nameEn])?.localized ?? "—"}
+            </span>
+          </p>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {option.values.map((value) => {
+              const isSelected = selected[option.nameEn] === value.en;
+              return (
+                <button
+                  key={value.en}
+                  type="button"
+                  onClick={() => setSelected((s) => ({ ...s, [option.nameEn]: value.en }))}
+                  className={`rounded-md border px-2.5 py-1 text-sm transition-colors ${
+                    isSelected
+                      ? "border-orion-accent bg-amber-50 font-semibold text-gray-900 ring-1 ring-orion-accent"
+                      : "border-gray-300 text-gray-700 hover:border-gray-500"
+                  }`}
+                >
+                  {value.localized}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+
       <p
         className={`mt-3 text-sm font-semibold ${
-          product.stock === 0
+          comboMissing || stock === 0
             ? "text-gray-500"
-            : product.stock <= 5
+            : stock <= 5
               ? "text-red-700"
               : "text-green-700"
         }`}
       >
-        {product.stock === 0
-          ? tc("outOfStock")
-          : product.stock <= 5
-            ? tc("onlyLeft", { count: product.stock })
-            : tc("inStock")}
+        {comboMissing
+          ? t("comboUnavailable")
+          : stock === 0
+            ? tc("outOfStock")
+            : stock <= 5
+              ? tc("onlyLeft", { count: stock })
+              : tc("inStock")}
       </p>
 
-      {product.stock > 0 ? (
+      {stock > 0 && !comboMissing ? (
         <>
           <label className="mt-3 flex items-center gap-2 text-sm">
             <span className="text-gray-700">{t("qty")}</span>
             <select
-              value={qty}
+              value={Math.min(qty, max)}
               onChange={(e) => setQty(Number(e.target.value))}
               className="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm outline-none focus:border-orion-accent"
             >
@@ -88,7 +172,20 @@ export default function BuyBox({ product }: { product: BuyBoxProduct }) {
           </label>
 
           <div className="mt-4 space-y-2">
-            <AddToCartButton product={product} qty={qty} size="lg" />
+            <AddToCartButton
+              product={{
+                id: product.id,
+                slug: product.slug,
+                titleEn: product.titleEn,
+                titleAr: product.titleAr,
+                price: product.price,
+                image: product.image,
+                stock: product.stock,
+              }}
+              variant={cartVariant}
+              qty={qty}
+              size="lg"
+            />
             <button
               type="button"
               onClick={buyNow}

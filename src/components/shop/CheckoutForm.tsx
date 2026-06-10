@@ -65,7 +65,11 @@ export default function CheckoutForm({ addresses }: { addresses: CheckoutAddress
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        items: items.map((i) => ({ productId: i.productId, qty: i.qty })),
+        items: items.map((i) => ({
+          productId: i.productId,
+          variantId: i.variantId ?? null,
+          qty: i.qty,
+        })),
         shipping: form,
         paymentMethod,
         locale,
@@ -264,12 +268,18 @@ export default function CheckoutForm({ addresses }: { addresses: CheckoutAddress
           <ul className="divide-y divide-gray-100">
             {items.map((item) => {
               const title = locale === "ar" ? item.titleAr : item.titleEn;
+              const variantLabel = locale === "ar" ? item.variantLabelAr : item.variantLabelEn;
               return (
-                <li key={item.productId} className="flex items-center gap-3 py-2 text-sm">
+                <li key={item.key} className="flex items-center gap-3 py-2 text-sm">
                   <span className="relative h-12 w-12 shrink-0">
                     <Image src={item.image} alt={title} fill sizes="48px" className="object-contain" />
                   </span>
-                  <span className="line-clamp-1 flex-1 text-gray-800">{title}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="line-clamp-1 block text-gray-800">{title}</span>
+                    {variantLabel ? (
+                      <span className="block text-xs text-gray-500">{variantLabel}</span>
+                    ) : null}
+                  </span>
                   <span className="text-gray-600">×{item.qty}</span>
                   <span className="font-semibold text-gray-900">
                     {formatEGP(item.price * item.qty, locale)}

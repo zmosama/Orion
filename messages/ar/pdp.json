@@ -6,6 +6,7 @@
     "listPrice": "السعر قبل الخصم",
     "aboutItem": "عن المنتج ده",
     "qty": "الكمية:",
+    "comboUnavailable": "التركيبة دي مش متاحة",
     "freeShippingNote": "شحن مجاني للطلبات فوق {amount}",
     "trustShipping": "توصيل سريع لباب البيت",
     "trustSecure": "معاملة آمنة",

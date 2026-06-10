@@ -82,12 +82,17 @@ model Address {
 // ===== الكتالوج =====
 
 model Category {
-  id       String    @id @default(cuid())
-  slug     String    @unique
+  id       String     @id @default(cuid())
+  slug     String     @unique
   nameEn   String
   nameAr   String
   image    String?
+  parentId String? // شجرة فئات — null = فئة رئيسية
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryTree")
   products Product[]
+
+  @@index([parentId])
 }
 
 model Product {
@@ -103,17 +108,37 @@ model Product {
   images        String // JSON array من الروابط
   specsEn       String? // JSON object للمواصفات — يُستخدم في جدول المقارنة
   specsAr       String? // نفس المفاتيح بالعربي
-  stock         Int         @default(0)
-  rating      Float       @default(0)
-  reviewCount Int         @default(0)
-  featured    Boolean     @default(false)
-  categoryId  String
-  category    Category    @relation(fields: [categoryId], references: [id])
-  orderItems  OrderItem[]
-  createdAt   DateTime    @default(now())
+  stock         Int         @default(0) // لو فيه variants: مجموع ستوكهم (بيتحدث تلقائياً)
+  rating        Float       @default(0)
+  reviewCount   Int         @default(0)
+  featured      Boolean     @default(false)
+  // الفاريانتس: optionsEn/Ar = JSON [{"name":"Size","values":["S","M"]}] لعرض أزرار الاختيار
+  hasVariants   Boolean     @default(false)
+  optionsEn     String?
+  optionsAr     String?
+  variants      ProductVariant[]
+  categoryId    String
+  category      Category    @relation(fields: [categoryId], references: [id])
+  orderItems    OrderItem[]
+  createdAt     DateTime    @default(now())
 
   @@index([categoryId])
   @@index([featured])
+}
+
+// تركيبة خيارات لمنتج (مثلاً المقاس M باللون الأحمر) — ليها ستوك وسعر خاصين
+model ProductVariant {
+  id         String      @id @default(cuid())
+  productId  String
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  optionsEn  String // JSON {"Size":"M","Color":"Red"}
+  optionsAr  String // JSON {"المقاس":"M","اللون":"أحمر"}
+  price      Int? // null ⇒ سعر المنتج الأساسي
+  stock      Int         @default(0)
+  image      String?
+  orderItems OrderItem[]
+
+  @@index([productId])
 }
 
 // ===== الطلبات =====
@@ -144,15 +169,19 @@ model Order {
 }
 
 model OrderItem {
-  id        String  @id @default(cuid())
-  orderId   String
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
-  titleEn   String // snapshot وقت الشراء
-  titleAr   String // snapshot وقت الشراء
-  price     Int // snapshot وقت الشراء
-  qty       Int
+  id             String          @id @default(cuid())
+  orderId        String
+  order          Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId      String
+  product        Product         @relation(fields: [productId], references: [id])
+  variantId      String? // SetNull عشان حذف الفاريانت ميكسرش تاريخ الطلبات — الـ label متسجل snapshot
+  variant        ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  titleEn        String // snapshot وقت الشراء
+  titleAr        String // snapshot وقت الشراء
+  variantLabelEn String? // snapshot مثل "Size: M · Color: Red"
+  variantLabelAr String?
+  price          Int // snapshot وقت الشراء
+  qty            Int
 
   @@index([orderId])
 }

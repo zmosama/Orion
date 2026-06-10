@@ -43,9 +43,10 @@ export default function CartView() {
         <ul className="divide-y divide-gray-200">
           {items.map((item) => {
             const title = locale === "ar" ? item.titleAr : item.titleEn;
+            const variantLabel = locale === "ar" ? item.variantLabelAr : item.variantLabelEn;
             const max = Math.min(MAX_QTY_PER_ITEM, Math.max(item.stock, 1));
             return (
-              <li key={item.productId} className="flex gap-4 py-4">
+              <li key={item.key} className="flex gap-4 py-4">
                 <Link href={`/products/${item.slug}`} className="relative h-24 w-24 shrink-0">
                   <Image src={item.image} alt={title} fill sizes="96px" className="object-contain" />
                 </Link>
@@ -57,6 +58,7 @@ export default function CartView() {
                   >
                     {title}
                   </Link>
+                  {variantLabel ? <p className="mt-0.5 text-xs text-gray-500">{variantLabel}</p> : null}
                   <p className="mt-1 text-lg font-bold text-gray-900">
                     {formatEGP(item.price, locale)}
                   </p>
@@ -65,7 +67,7 @@ export default function CartView() {
                       <span className="text-gray-600">{t("qty")}</span>
                       <select
                         value={item.qty}
-                        onChange={(e) => setQty(item.productId, Number(e.target.value))}
+                        onChange={(e) => setQty(item.key, Number(e.target.value))}
                         className="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm outline-none focus:border-orion-accent"
                       >
                         {Array.from({ length: max }, (_, i) => i + 1).map((n) => (
@@ -78,7 +80,7 @@ export default function CartView() {
                     <span className="text-gray-300">|</span>
                     <button
                       type="button"
-                      onClick={() => removeItem(item.productId)}
+                      onClick={() => removeItem(item.key)}
                       className="text-orion-link hover:underline"
                     >
                       {tc("delete")}

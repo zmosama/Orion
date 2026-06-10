@@ -15,13 +15,25 @@ export interface CartProduct {
   stock: number;
 }
 
+export interface CartVariant {
+  id: string;
+  labelEn: string;
+  labelAr: string;
+  price: number | null;
+  stock: number;
+  image?: string | null;
+}
+
 export default function AddToCartButton({
   product,
+  variant,
   qty = 1,
   size = "sm",
   className = "",
 }: {
   product: CartProduct;
+  /** التركيبة المختارة لو المنتج ليه variants */
+  variant?: CartVariant | null;
   qty?: number;
   size?: "sm" | "lg";
   className?: string;
@@ -30,10 +42,13 @@ export default function AddToCartButton({
   const t = useTranslations("common");
   const [added, setAdded] = useState(false);
 
+  const stock = variant ? variant.stock : product.stock;
+  const price = variant?.price ?? product.price;
+
   const sizeClasses = size === "lg" ? "px-6 py-2.5 text-base" : "px-3 py-1.5 text-sm";
   const base = `flex w-full items-center justify-center gap-2 rounded-full font-semibold transition-colors ${sizeClasses} ${className}`;
 
-  if (product.stock === 0) {
+  if (stock === 0) {
     return (
       <button disabled className={`${base} cursor-not-allowed bg-gray-200 text-gray-500`}>
         {t("outOfStock")}
@@ -45,12 +60,15 @@ export default function AddToCartButton({
     addItem(
       {
         productId: product.id,
+        variantId: variant?.id,
         slug: product.slug,
         titleEn: product.titleEn,
         titleAr: product.titleAr,
-        price: product.price,
-        image: product.image,
-        stock: product.stock,
+        variantLabelEn: variant?.labelEn,
+        variantLabelAr: variant?.labelAr,
+        price,
+        image: variant?.image || product.image,
+        stock,
       },
       qty,
     );

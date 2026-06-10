@@ -65,17 +65,27 @@ export default function ProductCard({ product }: { product: Product }) {
       ) : null}
 
       <div className="mt-auto pt-3">
-        <AddToCartButton
-          product={{
-            id: product.id,
-            slug: product.slug,
-            titleEn: product.titleEn,
-            titleAr: product.titleAr,
-            price: product.price,
-            image,
-            stock: product.stock,
-          }}
-        />
+        {product.hasVariants ? (
+          // منتج بمقاسات/ألوان — الاختيار من صفحة المنتج
+          <Link
+            href={`/products/${product.slug}`}
+            className="flex w-full items-center justify-center rounded-full border border-orion-accent px-3 py-1.5 text-sm font-semibold text-orion-accent-dark transition-colors hover:bg-amber-50"
+          >
+            {t("seeOptions")}
+          </Link>
+        ) : (
+          <AddToCartButton
+            product={{
+              id: product.id,
+              slug: product.slug,
+              titleEn: product.titleEn,
+              titleAr: product.titleAr,
+              price: product.price,
+              image,
+              stock: product.stock,
+            }}
+          />
+        )}
       </div>
     </div>
   );

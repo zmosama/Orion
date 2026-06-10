@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Plus, Trash2, Wand2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 
@@ -8,6 +9,27 @@ export interface ProductFormCategory {
   id: string;
   nameEn: string;
   nameAr: string;
+  depth: number;
+}
+
+export interface OptionValueRow {
+  en: string;
+  ar: string;
+}
+
+export interface OptionTypeRow {
+  nameEn: string;
+  nameAr: string;
+  values: OptionValueRow[];
+}
+
+export interface VariantRow {
+  id?: string;
+  comboEn: Record<string, string>;
+  comboAr: Record<string, string>;
+  labelEn: string;
+  price: string;
+  stock: string;
 }
 
 export interface ProductFormValues {
@@ -26,6 +48,8 @@ export interface ProductFormValues {
   specsEnText: string;
   specsArText: string;
   featured: boolean;
+  optionTypes: OptionTypeRow[];
+  variantRows: VariantRow[];
 }
 
 const inputClass =
@@ -44,6 +68,36 @@ function parseSpecs(text: string): Record<string, string> {
   }
   return out;
 }
+
+/** كل تركيبات الخيارات (cartesian product) */
+function buildCombos(types: OptionTypeRow[]): { comboEn: Record<string, string>; comboAr: Record<string, string> }[] {
+  let acc: { comboEn: Record<string, string>; comboAr: Record<string, string> }[] = [
+    { comboEn: {}, comboAr: {} },
+  ];
+  for (const type of types) {
+    if (!type.nameEn.trim() || type.values.length === 0) continue;
+    const next: typeof acc = [];
+    for (const base of acc) {
+      for (const value of type.values) {
+        if (!value.en.trim()) continue;
+        next.push({
+          comboEn: { ...base.comboEn, [type.nameEn.trim()]: value.en.trim() },
+          comboAr: {
+            ...base.comboAr,
+            [type.nameAr.trim() || type.nameEn.trim()]: value.ar.trim() || value.en.trim(),
+          },
+        });
+      }
+    }
+    acc = next;
+  }
+  return acc.filter((c) => Object.keys(c.comboEn).length > 0);
+}
+
+const comboLabel = (combo: Record<string, string>) =>
+  Object.entries(combo)
+    .map(([k, v]) => `${k}: ${v}`)
+    .join(" · ");
 
 export default function ProductForm({
   categories,
@@ -73,6 +127,8 @@ export default function ProductForm({
       specsEnText: "",
       specsArText: "",
       featured: false,
+      optionTypes: [],
+      variantRows: [],
     },
   );
   const [state, setState] = useState<"idle" | "saving" | "deleting">("idle");
@@ -82,11 +138,37 @@ export default function ProductForm({
     setForm((f) => ({ ...f, [key]: value }));
 
   const isEdit = Boolean(initial?.id);
+  const hasVariants = form.variantRows.length > 0;
+
+  // ===== إدارة أنواع الخيارات =====
+  const setTypes = (updater: (types: OptionTypeRow[]) => OptionTypeRow[]) =>
+    setForm((f) => ({ ...f, optionTypes: updater(f.optionTypes) }));
+
+  function generateCombos() {
+    const combos = buildCombos(form.optionTypes);
+    setForm((f) => ({
+      ...f,
+      variantRows: combos.map((c) => {
+        const key = JSON.stringify(c.comboEn);
+        const existing = f.variantRows.find((r) => JSON.stringify(r.comboEn) === key);
+        return {
+          id: existing?.id,
+          comboEn: c.comboEn,
+          comboAr: c.comboAr,
+          labelEn: comboLabel(c.comboEn),
+          price: existing?.price ?? "",
+          stock: existing?.stock ?? "0",
+        };
+      }),
+    }));
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setState("saving");
     setError(null);
+
+    const cleanTypes = form.optionTypes.filter((o) => o.nameEn.trim() && o.values.some((v) => v.en.trim()));
 
     const payload = {
       slug: form.slug.trim(),
@@ -106,6 +188,27 @@ export default function ProductForm({
       specsEn: parseSpecs(form.specsEnText),
       specsAr: parseSpecs(form.specsArText),
       featured: form.featured,
+      optionsEn: hasVariants
+        ? cleanTypes.map((o) => ({
+            name: o.nameEn.trim(),
+            values: o.values.filter((v) => v.en.trim()).map((v) => v.en.trim()),
+          }))
+        : [],
+      optionsAr: hasVariants
+        ? cleanTypes.map((o) => ({
+            name: o.nameAr.trim() || o.nameEn.trim(),
+            values: o.values
+              .filter((v) => v.en.trim())
+              .map((v) => v.ar.trim() || v.en.trim()),
+          }))
+        : [],
+      variants: form.variantRows.map((r) => ({
+        id: r.id,
+        optionsEn: r.comboEn,
+        optionsAr: r.comboAr,
+        price: r.price.trim() === "" ? null : Number(r.price),
+        stock: Number(r.stock) || 0,
+      })),
     };
 
     const res = await fetch(isEdit ? `/api/admin/products/${initial!.id}` : "/api/admin/products", {
@@ -190,13 +293,26 @@ export default function ProductForm({
         </label>
         <label className="block text-sm">
           <span className="mb-1 block font-semibold text-gray-700">{t("stockField")}</span>
-          <input type="number" required min={0} value={form.stock} onChange={(e) => set("stock")(e.target.value)} className={inputClass} dir="ltr" />
+          <input
+            type="number"
+            required
+            min={0}
+            value={hasVariants ? String(form.variantRows.reduce((s, r) => s + (Number(r.stock) || 0), 0)) : form.stock}
+            onChange={(e) => set("stock")(e.target.value)}
+            className={inputClass}
+            dir="ltr"
+            disabled={hasVariants}
+            title={hasVariants ? t("stockFromVariants") : undefined}
+          />
+          {hasVariants ? <span className="mt-1 block text-xs text-gray-500">{t("stockFromVariants")}</span> : null}
         </label>
         <label className="block text-sm">
           <span className="mb-1 block font-semibold text-gray-700">{t("categoryField")}</span>
           <select value={form.categoryId} onChange={(e) => set("categoryId")(e.target.value)} className={inputClass}>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>
+                {" ".repeat(c.depth * 3)}
+                {c.depth > 0 ? "└ " : ""}
                 {locale === "ar" ? c.nameAr : c.nameEn}
               </option>
             ))}
@@ -219,6 +335,204 @@ export default function ProductForm({
           <textarea rows={4} value={form.specsArText} onChange={(e) => set("specsArText")(e.target.value)} className={inputClass} dir="rtl" placeholder="البطارية: ٣٠ ساعة" />
         </label>
       </div>
+
+      {/* ===== الفاريانتس: مقاسات / ألوان / أوزان ===== */}
+      <section className="rounded-md border border-gray-200 bg-gray-50 p-4">
+        <h3 className="font-bold text-gray-900">{t("variantsTitle")}</h3>
+        <p className="mt-1 text-xs text-gray-600">{t("variantsHint")}</p>
+
+        {form.optionTypes.map((type, ti) => (
+          <div key={ti} className="mt-3 rounded-md border border-gray-200 bg-white p-3">
+            <div className="grid gap-2 sm:grid-cols-2">
+              <label className="block text-xs">
+                <span className="mb-1 block font-semibold text-gray-700">{t("optionNameEn")}</span>
+                <input
+                  value={type.nameEn}
+                  onChange={(e) =>
+                    setTypes((ts) => ts.map((o, i) => (i === ti ? { ...o, nameEn: e.target.value } : o)))
+                  }
+                  className={inputClass}
+                  dir="ltr"
+                  placeholder="Size / Color / Weight"
+                />
+              </label>
+              <label className="block text-xs">
+                <span className="mb-1 block font-semibold text-gray-700">{t("optionNameAr")}</span>
+                <input
+                  value={type.nameAr}
+                  onChange={(e) =>
+                    setTypes((ts) => ts.map((o, i) => (i === ti ? { ...o, nameAr: e.target.value } : o)))
+                  }
+                  className={inputClass}
+                  dir="rtl"
+                  placeholder="المقاس / اللون / الوزن"
+                />
+              </label>
+            </div>
+
+            <p className="mt-2 text-xs font-semibold text-gray-700">{t("optionValues")}</p>
+            {type.values.map((value, vi) => (
+              <div key={vi} className="mt-1 flex items-center gap-2">
+                <input
+                  value={value.en}
+                  onChange={(e) =>
+                    setTypes((ts) =>
+                      ts.map((o, i) =>
+                        i === ti
+                          ? { ...o, values: o.values.map((v, j) => (j === vi ? { ...v, en: e.target.value } : v)) }
+                          : o,
+                      ),
+                    )
+                  }
+                  className={`${inputClass} flex-1`}
+                  dir="ltr"
+                  placeholder="M / Red / 5kg"
+                />
+                <input
+                  value={value.ar}
+                  onChange={(e) =>
+                    setTypes((ts) =>
+                      ts.map((o, i) =>
+                        i === ti
+                          ? { ...o, values: o.values.map((v, j) => (j === vi ? { ...v, ar: e.target.value } : v)) }
+                          : o,
+                      ),
+                    )
+                  }
+                  className={`${inputClass} flex-1`}
+                  dir="rtl"
+                  placeholder="M / أحمر / ٥ كجم"
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setTypes((ts) =>
+                      ts.map((o, i) => (i === ti ? { ...o, values: o.values.filter((_, j) => j !== vi) } : o)),
+                    )
+                  }
+                  className="shrink-0 text-red-700"
+                  aria-label={tc("delete")}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+
+            <div className="mt-2 flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() =>
+                  setTypes((ts) =>
+                    ts.map((o, i) => (i === ti ? { ...o, values: [...o.values, { en: "", ar: "" }] } : o)),
+                  )
+                }
+                className="flex items-center gap-1 text-xs text-orion-link hover:underline"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                {t("addValue")}
+              </button>
+              <button
+                type="button"
+                onClick={() => setTypes((ts) => ts.filter((_, i) => i !== ti))}
+                className="flex items-center gap-1 text-xs text-red-700 hover:underline"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                {t("removeOption")}
+              </button>
+            </div>
+          </div>
+        ))}
+
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          {form.optionTypes.length < 3 ? (
+            <button
+              type="button"
+              onClick={() => setTypes((ts) => [...ts, { nameEn: "", nameAr: "", values: [{ en: "", ar: "" }] }])}
+              className="flex items-center gap-1 rounded-full border border-gray-300 bg-white px-4 py-1.5 text-sm hover:bg-gray-100"
+            >
+              <Plus className="h-4 w-4" />
+              {t("addOption")}
+            </button>
+          ) : null}
+          {form.optionTypes.length > 0 ? (
+            <button
+              type="button"
+              onClick={generateCombos}
+              className="flex items-center gap-1 rounded-full bg-orion-mid px-4 py-1.5 text-sm font-semibold text-white hover:bg-orion-light"
+            >
+              <Wand2 className="h-4 w-4" />
+              {t("generate")}
+            </button>
+          ) : null}
+        </div>
+
+        {form.variantRows.length > 0 ? (
+          <div className="mt-3 overflow-x-auto">
+            <table className="w-full min-w-120 text-sm">
+              <thead>
+                <tr className="border-b border-gray-200 text-xs uppercase text-gray-600">
+                  <th className="p-2 text-start">{t("variantLabel")}</th>
+                  <th className="p-2 text-start">{t("variantPrice")}</th>
+                  <th className="p-2 text-start">{t("stockField")}</th>
+                  <th className="p-2" />
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {form.variantRows.map((row, ri) => (
+                  <tr key={ri} className="bg-white">
+                    <td className="p-2 text-gray-800" dir="ltr">
+                      {row.labelEn}
+                    </td>
+                    <td className="p-2">
+                      <input
+                        type="number"
+                        min={1}
+                        value={row.price}
+                        placeholder={form.price || "—"}
+                        onChange={(e) =>
+                          setForm((f) => ({
+                            ...f,
+                            variantRows: f.variantRows.map((r, i) => (i === ri ? { ...r, price: e.target.value } : r)),
+                          }))
+                        }
+                        className={`${inputClass} w-28`}
+                        dir="ltr"
+                      />
+                    </td>
+                    <td className="p-2">
+                      <input
+                        type="number"
+                        min={0}
+                        value={row.stock}
+                        onChange={(e) =>
+                          setForm((f) => ({
+                            ...f,
+                            variantRows: f.variantRows.map((r, i) => (i === ri ? { ...r, stock: e.target.value } : r)),
+                          }))
+                        }
+                        className={`${inputClass} w-24`}
+                        dir="ltr"
+                      />
+                    </td>
+                    <td className="p-2">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setForm((f) => ({ ...f, variantRows: f.variantRows.filter((_, i) => i !== ri) }))
+                        }
+                        className="text-red-700"
+                        aria-label={tc("delete")}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : null}
+      </section>
 
       <label className="flex items-center gap-2 text-sm text-gray-700">
         <input

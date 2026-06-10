@@ -6,8 +6,11 @@ import {
   categoryName,
   productDescription,
   productImages,
+  productOptionTypes,
   productSpecs,
   productTitle,
+  variantLabel,
+  variantOptions,
 } from "@/lib/catalog";
 import { discountPercent, formatEGP } from "@/lib/money";
 import { Link } from "@/i18n/navigation";
@@ -39,9 +42,27 @@ export default async function ProductPage({ params }: Props) {
 
   const product = await prisma.product.findUnique({
     where: { slug },
-    include: { category: true },
+    include: { category: true, variants: true },
   });
   if (!product) notFound();
+
+  // تجهيز خيارات الفاريانتس (مقاسات/ألوان…) — محاذاة EN/AR بالترتيب
+  const optionTypesEn = productOptionTypes(product, "en");
+  const optionTypesLoc = productOptionTypes(product, locale);
+  const buyBoxOptions = optionTypesEn.map((o, i) => ({
+    nameEn: o.name,
+    nameLocalized: optionTypesLoc[i]?.name ?? o.name,
+    values: o.values.map((v, j) => ({ en: v, localized: optionTypesLoc[i]?.values[j] ?? v })),
+  }));
+  const buyBoxVariants = product.variants.map((v) => ({
+    id: v.id,
+    optionsEn: variantOptions(v, "en"),
+    labelEn: variantLabel(v, "en"),
+    labelAr: variantLabel(v, "ar"),
+    price: v.price,
+    stock: v.stock,
+    image: v.image,
+  }));
 
   const related = await prisma.product.findMany({
     where: { categoryId: product.categoryId, id: { not: product.id } },
@@ -135,7 +156,10 @@ export default async function ProductPage({ params }: Props) {
               price: product.price,
               image: images[0],
               stock: product.stock,
+              hasVariants: product.hasVariants,
             }}
+            options={product.hasVariants ? buyBoxOptions : []}
+            variants={product.hasVariants ? buyBoxVariants : []}
           />
         </div>
       </div>

@@ -1,4 +1,12 @@
-import { LayoutDashboard, Package, ShieldX, ShoppingBag, Store, Users } from "lucide-react";
+import {
+  FolderTree,
+  LayoutDashboard,
+  Package,
+  ShieldX,
+  ShoppingBag,
+  Store,
+  Users,
+} from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { Link, redirect } from "@/i18n/navigation";
@@ -31,6 +39,7 @@ export default async function AdminLayout({
   const nav = [
     { href: "/admin", icon: LayoutDashboard, label: t("nav.dashboard") },
     { href: "/admin/products", icon: Package, label: t("nav.products") },
+    { href: "/admin/categories", icon: FolderTree, label: t("nav.categories") },
     { href: "/admin/orders", icon: ShoppingBag, label: t("nav.orders") },
     { href: "/admin/customers", icon: Users, label: t("nav.customers") },
   ] as const;
