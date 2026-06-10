@@ -1,1 +1,20 @@
-{}
+{
+  "pdp": {
+    "breadcrumbHome": "Home",
+    "brand": "Brand: {brand}",
+    "ratings": "{count, plural, one {# rating} other {# ratings}}",
+    "listPrice": "List price",
+    "aboutItem": "About this item",
+    "qty": "Qty:",
+    "freeShippingNote": "FREE shipping on orders over {amount}",
+    "trustShipping": "Fast home delivery",
+    "trustSecure": "Secure transaction",
+    "trustCOD": "Cash on delivery available",
+    "related": "Similar products you might like",
+    "compareTitle": "Compare with similar items",
+    "thisItem": "This item",
+    "price": "Price",
+    "rating": "Customer rating",
+    "availability": "Availability"
+  }
+}

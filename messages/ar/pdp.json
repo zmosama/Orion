@@ -1,1 +1,20 @@
-{}
+{
+  "pdp": {
+    "breadcrumbHome": "الرئيسية",
+    "brand": "الماركة: {brand}",
+    "ratings": "{count, plural, zero {لا تقييمات} one {تقييم واحد} two {تقييمان} few {# تقييمات} many {# تقييماً} other {# تقييم}}",
+    "listPrice": "السعر قبل الخصم",
+    "aboutItem": "عن المنتج ده",
+    "qty": "الكمية:",
+    "freeShippingNote": "شحن مجاني للطلبات فوق {amount}",
+    "trustShipping": "توصيل سريع لباب البيت",
+    "trustSecure": "معاملة آمنة",
+    "trustCOD": "الدفع عند الاستلام متاح",
+    "related": "منتجات مشابهة ممكن تعجبك",
+    "compareTitle": "قارن مع منتجات مشابهة",
+    "thisItem": "المنتج ده",
+    "price": "السعر",
+    "rating": "تقييم العملاء",
+    "availability": "التوفر"
+  }
+}

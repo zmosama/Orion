@@ -40,11 +40,11 @@
 - [x] `src/app/[locale]/search/page.tsx` — نتائج بحث (titleEn/titleAr/description/brand)
 - [x] `src/components/home/*` (HeroBanner + CategoryCardGrid من Agent A قبل القطع، ProductRow + SortSelect من Main) + `messages/{en,ar}/home.json`
 
-### Agent B — صفحة المنتج
-- [ ] `src/app/[locale]/products/[slug]/page.tsx` — جاليري + تفاصيل + Buy Box
-- [ ] منتجات مشابهة (Related) من نفس الفئة
-- [ ] جدول مقارنة مع المنتجات المشابهة (specs bilingual)
-- [ ] `src/components/pdp/*` + `messages/{en,ar}/pdp.json`
+### Agent B — صفحة المنتج ✅ (نفّذها Main بعد حد الاستخدام)
+- [x] `src/app/[locale]/products/[slug]/page.tsx` — breadcrumb + جاليري + تفاصيل + Buy Box (ISR 120s)
+- [x] منتجات مشابهة (Related) من نفس الفئة — صف أفقي
+- [x] جدول مقارنة مع 3 منتجات مشابهة (specs bilingual + "المنتج ده" highlighted)
+- [x] `src/components/pdp/` (Gallery + BuyBox مع Buy Now + CompareTable) + `messages/{en,ar}/pdp.json`
 
 ### Agent C — الحسابات والعملاء
 - [ ] `src/app/[locale]/login/page.tsx` — credentials + أزرار Google/Facebook/Apple
