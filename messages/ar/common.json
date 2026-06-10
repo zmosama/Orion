@@ -1,0 +1,65 @@
+{
+  "common": {
+    "addToCart": "أضف للسلة",
+    "addedToCart": "تمت الإضافة",
+    "buyNow": "اشترِ الآن",
+    "outOfStock": "غير متوفر حالياً",
+    "onlyLeft": "باقي {count} فقط في المخزون — اطلب بسرعة",
+    "inStock": "متوفر",
+    "freeShipping": "شحن مجاني",
+    "viewAll": "عرض الكل",
+    "loading": "جاري التحميل…",
+    "error": "حصلت مشكلة، حاول تاني.",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "confirm": "تأكيد",
+    "notFoundTitle": "تايه في الفضاء",
+    "notFoundText": "الصفحة اللي بتدور عليها مش موجودة.",
+    "backHome": "الرجوع للرئيسية"
+  },
+  "header": {
+    "searchPlaceholder": "ابحث في أوريون",
+    "hello": "أهلاً، {name}",
+    "helloGuest": "أهلاً، سجّل دخولك",
+    "accountAndLists": "الحساب والقوائم",
+    "yourAccount": "حسابك",
+    "yourOrders": "طلباتك",
+    "signIn": "تسجيل الدخول",
+    "signOut": "تسجيل الخروج",
+    "newCustomer": "عميل جديد؟",
+    "startHere": "ابدأ من هنا.",
+    "returnsLine": "المرتجعات",
+    "ordersLine": "والطلبات",
+    "cart": "السلة",
+    "all": "الكل"
+  },
+  "footer": {
+    "backToTop": "الرجوع لأعلى",
+    "shop": "تسوّق",
+    "home": "الرئيسية",
+    "cart": "السلة",
+    "orders": "الطلبات",
+    "customerService": "خدمة العملاء",
+    "contactUs": "اتصل بنا",
+    "shippingPolicy": "الشحن والتوصيل",
+    "returnsPolicy": "الاسترجاع والاستبدال",
+    "aboutTitle": "عن أوريون",
+    "aboutText": "أوريون متجرك لكل حاجة — إلكترونيات ومنزل وموضة ورياضة، بتوصلك لحد باب البيت بأفضل الأسعار.",
+    "rights": "© {year} أوريون. كل الحقوق محفوظة."
+  },
+  "orderStatus": {
+    "PENDING_PAYMENT": "في انتظار الدفع",
+    "CONFIRMED": "تم التأكيد",
+    "PAID": "تم الدفع",
+    "SHIPPED": "تم الشحن",
+    "DELIVERED": "تم التوصيل",
+    "CANCELLED": "ملغي",
+    "EXPIRED": "انتهت مهلة الدفع"
+  },
+  "paymentMethod": {
+    "COD": "الدفع عند الاستلام",
+    "CARD": "بطاقة بنكية / محفظة إلكترونية (Paymob)"
+  }
+}

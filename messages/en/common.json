@@ -1,0 +1,65 @@
+{
+  "common": {
+    "addToCart": "Add to Cart",
+    "addedToCart": "Added",
+    "buyNow": "Buy Now",
+    "outOfStock": "Currently unavailable",
+    "onlyLeft": "Only {count} left in stock — order soon",
+    "inStock": "In Stock",
+    "freeShipping": "FREE Shipping",
+    "viewAll": "See all",
+    "loading": "Loading…",
+    "error": "Something went wrong. Please try again.",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "confirm": "Confirm",
+    "notFoundTitle": "Lost in space",
+    "notFoundText": "The page you are looking for doesn't exist.",
+    "backHome": "Back to home"
+  },
+  "header": {
+    "searchPlaceholder": "Search Orion",
+    "hello": "Hello, {name}",
+    "helloGuest": "Hello, sign in",
+    "accountAndLists": "Account & Lists",
+    "yourAccount": "Your Account",
+    "yourOrders": "Your Orders",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "newCustomer": "New customer?",
+    "startHere": "Start here.",
+    "returnsLine": "Returns",
+    "ordersLine": "& Orders",
+    "cart": "Cart",
+    "all": "All"
+  },
+  "footer": {
+    "backToTop": "Back to top",
+    "shop": "Shop",
+    "home": "Home",
+    "cart": "Cart",
+    "orders": "Orders",
+    "customerService": "Customer Service",
+    "contactUs": "Contact us",
+    "shippingPolicy": "Shipping & Delivery",
+    "returnsPolicy": "Returns & Refunds",
+    "aboutTitle": "About Orion",
+    "aboutText": "Orion is your store for everything — electronics, home, fashion and sports, delivered to your door at the best prices.",
+    "rights": "© {year} Orion. All rights reserved."
+  },
+  "orderStatus": {
+    "PENDING_PAYMENT": "Awaiting payment",
+    "CONFIRMED": "Confirmed",
+    "PAID": "Paid",
+    "SHIPPED": "Shipped",
+    "DELIVERED": "Delivered",
+    "CANCELLED": "Cancelled",
+    "EXPIRED": "Payment window expired"
+  },
+  "paymentMethod": {
+    "COD": "Cash on Delivery",
+    "CARD": "Card / Mobile Wallet (Paymob)"
+  }
+}

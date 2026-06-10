@@ -1,0 +1,157 @@
+// Orion — Prisma Schema
+// التطوير: SQLite. الإنتاج: غيّر provider إلى "postgresql" وحدّث DATABASE_URL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ===== المستخدمون والجلسات (NextAuth) =====
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
+  phone         String?
+  accounts      Account[]
+  sessions      Session[]
+  addresses     Address[]
+  orders        Order[]
+  createdAt     DateTime  @default(now())
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ===== العناوين =====
+
+model Address {
+  id          String  @id @default(cuid())
+  userId      String
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label       String? // المنزل / العمل
+  fullName    String
+  phone       String
+  governorate String
+  city        String
+  line        String // الشارع والمبنى والشقة
+  isDefault   Boolean @default(false)
+
+  @@index([userId])
+}
+
+// ===== الكتالوج =====
+
+model Category {
+  id       String    @id @default(cuid())
+  slug     String    @unique
+  nameEn   String
+  nameAr   String
+  image    String?
+  products Product[]
+}
+
+model Product {
+  id            String      @id @default(cuid())
+  slug          String      @unique
+  titleEn       String
+  titleAr       String
+  brand         String?
+  descriptionEn String
+  descriptionAr String
+  price         Int // بالجنيه المصري
+  listPrice     Int? // السعر قبل الخصم
+  images        String // JSON array من الروابط
+  specsEn       String? // JSON object للمواصفات — يُستخدم في جدول المقارنة
+  specsAr       String? // نفس المفاتيح بالعربي
+  stock         Int         @default(0)
+  rating      Float       @default(0)
+  reviewCount Int         @default(0)
+  featured    Boolean     @default(false)
+  categoryId  String
+  category    Category    @relation(fields: [categoryId], references: [id])
+  orderItems  OrderItem[]
+  createdAt   DateTime    @default(now())
+
+  @@index([categoryId])
+  @@index([featured])
+}
+
+// ===== الطلبات =====
+// status: PENDING_PAYMENT | CONFIRMED | PAID | SHIPPED | DELIVERED | CANCELLED | EXPIRED
+// (SQLite لا يدعم enum — الثوابت في src/lib/constants.ts)
+
+model Order {
+  id                  String      @id @default(cuid())
+  userId              String
+  user                User        @relation(fields: [userId], references: [id])
+  status              String
+  paymentMethod       String // COD | CARD
+  subtotal            Int
+  shippingFee         Int
+  total               Int
+  shippingName        String
+  shippingPhone       String
+  shippingGovernorate String
+  shippingCity        String
+  shippingLine        String
+  reservedUntil       DateTime? // مهلة الدفع للطلبات الأونلاين — بعدها يتحرر الستوك
+  items               OrderItem[]
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([status, reservedUntil])
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  titleEn   String // snapshot وقت الشراء
+  titleAr   String // snapshot وقت الشراء
+  price     Int // snapshot وقت الشراء
+  qty       Int
+
+  @@index([orderId])
+}

@@ -1,26 +1,29 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ===== Orion Design Tokens ===== */
+@theme {
+  --color-orion-dark: #0b1426;
+  --color-orion-mid: #16263f;
+  --color-orion-light: #233d63;
+  --color-orion-accent: #f5a623;
+  --color-orion-accent-dark: #e08a00;
+  --color-orion-link: #2e7cd6;
+  --color-orion-bg: #eaeded;
+  --font-sans: var(--font-cairo), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial,
+    sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-orion-bg);
+  color: #111827;
+  font-family: var(--font-sans);
+}
+
+/* لإخفاء سكرول صفوف المنتجات الأفقية */
+@utility scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
