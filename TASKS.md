@@ -80,7 +80,21 @@
 - [x] اختبارات: أدمن يدخل ويشوف الداشبورد (EN+AR) / عميل عادي Access denied من غير داتا / عميل على API أدمن ⇒ 403 / إنشاء وحذف منتج من API الأدمن ✓
 - [x] إيقاف تعريض Prisma Studio على التانل (الأدمن الجديد بديله)
 
-## خطوات جاية (اختيارية)
-- [ ] مفاتيح OAuth حقيقية (Google/Facebook/Apple) + مفاتيح Paymob + webhook لتأكيد الدفع (`markOrderPaid` جاهزة في lib/stock)
-- [ ] نشر على VPS خلف Cloudflare + PostgreSQL + cron لتحرير الحجوزات
-- [ ] صور منتجات حقيقية بدل picsum + لوحة أدمن
+## Roadmap — إكمال Orion (قرار محمد 2026-06-10: نكمّل المنتج الأول، والـ SaaS بعدين)
+
+### Phase 5 — اكتمال المتجر
+- [ ] Paymob فعلي: مفاتيح حقيقية + webhook تأكيد الدفع (`markOrderPaid` جاهزة في lib/stock)
+- [ ] مفاتيح OAuth حقيقية (Google / Facebook / Apple)
+- [ ] منتجات وصور حقيقية بدل الـ seed (تخزين الصور على Cloudflare R2)
+- [ ] إيميلات الطلبات (تأكيد / شحن / إلغاء)
+- [ ] مراجعات العملاء (تقييم + تعليق بعد الاستلام)
+- [ ] كوبونات خصم
+- [ ] جدولة cron فعلية لتحرير الحجوزات (Cloudflare Worker Cron ⇒ `/api/cron/release-stock`)
+- [ ] تشغيل تلقائي للسيرفر على الجهاز (launchd) أو النقل لـ VPS (دروبليت 2vCPU/4GB فرانكفورت + PostgreSQL)
+
+### Phase 6 — التحويل لـ SaaS multi-tenant (بعد اكتمال المنتج)
+- [ ] جدول Store + `storeId` على كل الجداول + Prisma Client Extension للفلترة التلقائية + Postgres RLS
+- [ ] توجيه بالدومين (proxy.ts) + Cloudflare for SaaS للدومينات المخصصة
+- [ ] ثيم لكل متجر من الـ DB (ألوان/لوجو/محتوى — الـ CSS vars جاهزة لده)
+- [ ] لوحة Super Admin (إنشاء متاجر، باقات، اشتراكات)
+- ⚠️ **قاعدة من دلوقتي:** أي كود جديد يتكتب tenant-aware — مفيش hardcoding لهوية المتجر جوه المكونات
