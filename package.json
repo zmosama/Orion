@@ -9,7 +9,7 @@
     "lint": "eslint",
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio --port 5556"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
