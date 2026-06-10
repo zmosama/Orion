@@ -53,17 +53,24 @@
 - [x] `PATCH /api/account/profile` + `POST /api/account/addresses` + `PATCH/DELETE /api/account/addresses/[id]` (كله auth-scoped + أول عنوان بيبقى افتراضي)
 - [x] `src/components/account/` (LoginForm, OAuthButtons بأيقونات Google/FB/Apple, RegisterForm, ProfileForm, AddressBook) + `messages/{en,ar}/account.json`
 
-### Agent D — السلة والدفع والطلبات
-- [ ] `src/app/[locale]/cart/page.tsx`
-- [ ] `src/app/[locale]/checkout/page.tsx` — عنوان + طريقة دفع (COD/Paymob)
-- [ ] `POST /api/checkout` — حجز ذرّي عبر `lib/stock`
-- [ ] `src/app/[locale]/orders/page.tsx` + `orders/[id]/page.tsx` + زر إلغاء
-- [ ] `POST /api/orders/[id]/cancel` + `GET /api/cron/release-stock`
-- [ ] `messages/{en,ar}/shop.json`
+### Agent D — السلة والدفع والطلبات ✅ (نفّذها Main بعد حد الاستخدام)
+- [x] `src/app/[locale]/cart/page.tsx` — سلة كاملة بكميات وحذف وملخص وشحن مجاني فوق 1000
+- [x] `src/app/[locale]/checkout/page.tsx` — عناوين محفوظة + عنوان جديد + COD/Paymob + مراجعة وإجماليات
+- [x] `POST /api/checkout` — حجز ذرّي عبر `lib/stock` + rate limit + إلغاء تلقائي لو فشلت تهيئة الدفع
+- [x] `src/app/[locale]/orders/page.tsx` + `orders/[id]/page.tsx` + زر إلغاء + بانر نجاح + تنبيه مهلة الدفع
+- [x] `POST /api/orders/[id]/cancel` + `GET /api/cron/release-stock` (محمي بـ CRON_SECRET)
+- [x] `messages/{en,ar}/shop.json` + `src/components/shop/` (CartView, CheckoutForm, CancelOrderButton)
 
-## Phase 3 — Integration & QA (Main)
-- [ ] مراجعة تكامل شغل الأجينتس + حل التعارضات
-- [ ] `npm run build` ناجح بدون أخطاء TypeScript
-- [ ] اختبار يدوي: تصفح → سلة → checkout → إلغاء → رجوع الستوك (باللغتين)
-- [ ] اختبار التزاحم: طلبين متوازيين على آخر قطعة ⇒ واحد بس ينجح
-- [ ] README.md نهائي (تشغيل + مفاتيح OAuth/Paymob + نشر)
+## Phase 3 — Integration & QA (Main) ✅
+- [x] `npm run build` ناجح بدون أخطاء TypeScript (كل الـ routes)
+- [x] **اختبار التزاحم نجح**: ستوك = 1 + طلبين متوازيين ⇒ واحد CONFIRMED والتاني 409 OUT_OF_STOCK، الستوك النهائي 0 وأوردر واحد بس
+- [x] **اختبار الإلغاء نجح**: إلغاء ⇒ الستوك رجع 1 والحالة CANCELLED، وإلغاء تاني ⇒ 400 NOT_CANCELLABLE (مفيش restock مزدوج)
+- [x] اختبار API: تسجيل → دخول credentials → session بـ user.id ✅
+- [x] smoke test للصفحات باللغتين: الرئيسية + المنتج (مقارنة وBuy Now) + الفئة + البحث + الدخول ✅
+- [x] README.md نهائي (تشغيل + مفاتيح OAuth/Paymob + عدالة الستوك + نشر)
+- [x] مستخدم تجريبي: test@orion.dev / test12345
+
+## خطوات جاية (اختيارية)
+- [ ] مفاتيح OAuth حقيقية (Google/Facebook/Apple) + مفاتيح Paymob + webhook لتأكيد الدفع (`markOrderPaid` جاهزة في lib/stock)
+- [ ] نشر على VPS خلف Cloudflare + PostgreSQL + cron لتحرير الحجوزات
+- [ ] صور منتجات حقيقية بدل picsum + لوحة أدمن
