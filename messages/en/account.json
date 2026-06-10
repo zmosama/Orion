@@ -1,1 +1,52 @@
-{}
+{
+  "auth": {
+    "signInTitle": "Sign in",
+    "email": "Email",
+    "password": "Password",
+    "signInButton": "Sign in",
+    "invalidCredentials": "Incorrect email or password. Please try again.",
+    "orDivider": "or continue with",
+    "google": "Continue with Google",
+    "facebook": "Continue with Facebook",
+    "apple": "Continue with Apple",
+    "oauthSoon": "Social sign-in will be available soon.",
+    "newToOrion": "New to Orion?",
+    "createAccount": "Create your Orion account",
+    "registerTitle": "Create account",
+    "name": "Your name",
+    "phone": "Mobile number (optional)",
+    "passwordHint": "At least 8 characters",
+    "registerButton": "Create your Orion account",
+    "haveAccount": "Already have an account?",
+    "signInLink": "Sign in",
+    "errors": {
+      "EMAIL_EXISTS": "An account with this email already exists.",
+      "INVALID_INPUT": "Please check your details and try again.",
+      "RATE_LIMITED": "Too many attempts — please try again in a minute."
+    }
+  },
+  "account": {
+    "title": "Your Account",
+    "ordersCard": "Your Orders",
+    "ordersCardHint": "Track, cancel or review your orders",
+    "profileTitle": "Login & security",
+    "emailLabel": "Email",
+    "nameLabel": "Name",
+    "phoneLabel": "Mobile number",
+    "saved": "Saved ✓",
+    "addressesTitle": "Your Addresses",
+    "defaultBadge": "Default",
+    "setDefault": "Set as default",
+    "addAddress": "Add address",
+    "labelField": "Label (home, work…) — optional",
+    "fullName": "Full name",
+    "phoneField": "Phone",
+    "governorate": "Governorate",
+    "city": "City",
+    "line": "Street name, building, apartment",
+    "makeDefault": "Make this my default address",
+    "deleteConfirm": "Delete this address?",
+    "noAddresses": "No saved addresses yet.",
+    "addressHint": "Your default address is used to speed up checkout."
+  }
+}

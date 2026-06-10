@@ -1,1 +1,52 @@
-{}
+{
+  "auth": {
+    "signInTitle": "تسجيل الدخول",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "signInButton": "ادخل",
+    "invalidCredentials": "البريد أو كلمة المرور غلط. حاول تاني.",
+    "orDivider": "أو كمّل بـ",
+    "google": "المتابعة بحساب جوجل",
+    "facebook": "المتابعة بحساب فيسبوك",
+    "apple": "المتابعة بحساب أبل",
+    "oauthSoon": "الدخول بالحسابات الاجتماعية هيتوفر قريباً.",
+    "newToOrion": "جديد على أوريون؟",
+    "createAccount": "اعمل حساب أوريون",
+    "registerTitle": "إنشاء حساب",
+    "name": "اسمك",
+    "phone": "رقم الموبايل (اختياري)",
+    "passwordHint": "٨ حروف على الأقل",
+    "registerButton": "اعمل حسابك في أوريون",
+    "haveAccount": "عندك حساب بالفعل؟",
+    "signInLink": "سجّل دخولك",
+    "errors": {
+      "EMAIL_EXISTS": "في حساب متسجل بالإيميل ده بالفعل.",
+      "INVALID_INPUT": "راجع بياناتك وحاول تاني.",
+      "RATE_LIMITED": "محاولات كتير — استنى دقيقة وحاول تاني."
+    }
+  },
+  "account": {
+    "title": "حسابك",
+    "ordersCard": "طلباتك",
+    "ordersCardHint": "تابع طلباتك أو الغيها أو راجعها",
+    "profileTitle": "الدخول والأمان",
+    "emailLabel": "البريد الإلكتروني",
+    "nameLabel": "الاسم",
+    "phoneLabel": "رقم الموبايل",
+    "saved": "اتحفظ ✓",
+    "addressesTitle": "عناوينك",
+    "defaultBadge": "الافتراضي",
+    "setDefault": "خليه الافتراضي",
+    "addAddress": "أضف عنوان",
+    "labelField": "تسمية (البيت، الشغل…) — اختياري",
+    "fullName": "الاسم بالكامل",
+    "phoneField": "الموبايل",
+    "governorate": "المحافظة",
+    "city": "المدينة",
+    "line": "اسم الشارع والمبنى والشقة",
+    "makeDefault": "خلي ده عنواني الافتراضي",
+    "deleteConfirm": "تحذف العنوان ده؟",
+    "noAddresses": "مفيش عناوين متحفظة لسه.",
+    "addressHint": "عنوانك الافتراضي بيسرّع إتمام الطلب."
+  }
+}

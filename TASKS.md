@@ -46,12 +46,12 @@
 - [x] جدول مقارنة مع 3 منتجات مشابهة (specs bilingual + "المنتج ده" highlighted)
 - [x] `src/components/pdp/` (Gallery + BuyBox مع Buy Now + CompareTable) + `messages/{en,ar}/pdp.json`
 
-### Agent C — الحسابات والعملاء
-- [ ] `src/app/[locale]/login/page.tsx` — credentials + أزرار Google/Facebook/Apple
-- [ ] `src/app/[locale]/register/page.tsx` + `POST /api/register`
-- [ ] `src/app/[locale]/account/page.tsx` — البيانات + الموبايل + العناوين
-- [ ] `PATCH /api/account/profile` + `POST/DELETE /api/account/addresses`
-- [ ] `src/components/account/*` + `messages/{en,ar}/account.json`
+### Agent C — الحسابات والعملاء ✅ (نفّذها Main بعد حد الاستخدام)
+- [x] `src/app/[locale]/login/page.tsx` — credentials + أزرار Google/Facebook/Apple (بتتفعّل تلقائياً بمفاتيح .env، disabled مع ملاحظة لو مش متظبطة)
+- [x] `src/app/[locale]/register/page.tsx` + `POST /api/register` (zod + bcrypt + rate limit + auto sign-in)
+- [x] `src/app/[locale]/account/page.tsx` — كارت الطلبات + بيانات الدخول (الاسم/الموبايل) + دفتر العناوين
+- [x] `PATCH /api/account/profile` + `POST /api/account/addresses` + `PATCH/DELETE /api/account/addresses/[id]` (كله auth-scoped + أول عنوان بيبقى افتراضي)
+- [x] `src/components/account/` (LoginForm, OAuthButtons بأيقونات Google/FB/Apple, RegisterForm, ProfileForm, AddressBook) + `messages/{en,ar}/account.json`
 
 ### Agent D — السلة والدفع والطلبات
 - [ ] `src/app/[locale]/cart/page.tsx`
