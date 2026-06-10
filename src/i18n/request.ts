@@ -7,12 +7,13 @@ export default getRequestConfig(async ({ requestLocale }) => {
   const locale = hasLocale(routing.locales, requested) ? requested : routing.defaultLocale;
 
   // الرسائل مقسومة ملفات حسب ملكية الأجينتس — الـ namespaces الجذرية مميزة لكل ملف
-  const [common, home, pdp, account, shop] = await Promise.all([
+  const [common, home, pdp, account, shop, admin] = await Promise.all([
     import(`../../messages/${locale}/common.json`),
     import(`../../messages/${locale}/home.json`),
     import(`../../messages/${locale}/pdp.json`),
     import(`../../messages/${locale}/account.json`),
     import(`../../messages/${locale}/shop.json`),
+    import(`../../messages/${locale}/admin.json`),
   ]);
 
   return {
@@ -23,6 +24,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       ...pdp.default,
       ...account.default,
       ...shop.default,
+      ...admin.default,
     },
   };
 });

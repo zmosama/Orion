@@ -32,7 +32,7 @@ providers.push(
       const valid = await bcrypt.compare(password, user.passwordHash);
       if (!valid) return null;
 
-      return { id: user.id, name: user.name, email: user.email, image: user.image };
+      return { id: user.id, name: user.name, email: user.email, image: user.image, role: user.role };
     },
   }),
 );
@@ -47,10 +47,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     jwt({ token, user }) {
       if (user?.id) token.id = user.id;
+      // الـ role بييجي من الـ DB وقت تسجيل الدخول (credentials أو OAuth adapter)
+      if (user && "role" in user) token.role = (user as { role?: string }).role ?? "customer";
       return token;
     },
     session({ session, token }) {
-      if (session.user) session.user.id = (token.id ?? token.sub) as string;
+      if (session.user) {
+        session.user.id = (token.id ?? token.sub) as string;
+        session.user.role = (token.role as string) ?? "customer";
+      }
       return session;
     },
   },

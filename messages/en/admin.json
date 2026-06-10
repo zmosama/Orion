@@ -1,0 +1,82 @@
+{
+  "admin": {
+    "forbiddenTitle": "Access denied",
+    "forbiddenText": "This area is for store administrators only.",
+    "nav": {
+      "dashboard": "Dashboard",
+      "products": "Products",
+      "orders": "Orders",
+      "customers": "Customers",
+      "viewStore": "View store"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "totalOrders": "Total orders",
+      "revenue": "Revenue (active orders)",
+      "customers": "Customers",
+      "lowStock": "Low stock (≤5)",
+      "lowStockTitle": "Low stock products",
+      "noLowStock": "All products are well stocked.",
+      "recentOrders": "Recent orders",
+      "noOrders": "No orders yet.",
+      "stockLeft": "{count} left"
+    },
+    "products": {
+      "title": "Products",
+      "addNew": "Add product",
+      "image": "Image",
+      "product": "Product",
+      "category": "Category",
+      "price": "Price",
+      "stock": "Stock",
+      "featured": "Featured",
+      "actions": "Actions",
+      "edit": "Edit",
+      "newTitle": "New product",
+      "editTitle": "Edit product",
+      "slug": "Slug (URL, English letters/dashes)",
+      "titleEn": "Title (English)",
+      "titleAr": "Title (Arabic)",
+      "brand": "Brand",
+      "descEn": "Description (English)",
+      "descAr": "Description (Arabic)",
+      "priceField": "Price (EGP)",
+      "listPrice": "List price before discount (optional)",
+      "stockField": "Stock",
+      "categoryField": "Category",
+      "images": "Image URLs (one per line)",
+      "specsEn": "Specs EN (key: value — one per line)",
+      "specsAr": "Specs AR (key: value — one per line)",
+      "featuredField": "Featured (shows in Best Sellers)",
+      "save": "Save product",
+      "saved": "Saved ✓",
+      "deleteProduct": "Delete product",
+      "deleteConfirm": "Delete this product permanently?",
+      "deleteBlocked": "Cannot delete: this product has orders. Set its stock to 0 instead.",
+      "invalid": "Please check the fields and try again."
+    },
+    "orders": {
+      "title": "Orders",
+      "order": "Order",
+      "date": "Date",
+      "customer": "Customer",
+      "items": "Items",
+      "total": "Total",
+      "payment": "Payment",
+      "status": "Status",
+      "restockNote": "Setting an order to Cancelled returns its items to stock automatically.",
+      "updateFailed": "Could not update this order's status.",
+      "empty": "No orders yet."
+    },
+    "customers": {
+      "title": "Customers",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "role": "Role",
+      "orders": "Orders",
+      "joined": "Joined",
+      "empty": "No customers yet."
+    }
+  }
+}

@@ -5,6 +5,13 @@
 - **Repo:** https://github.com/zmosama/Orion
 - **الخطة الكاملة:** [PLAN.md](PLAN.md) — **حالة التنفيذ:** [TASKS.md](TASKS.md)
 
+## لوحة الأدمن
+
+- المسار: `/admin` (و `/ar/admin` للعربي) — محمية بـ role (`admin` في جدول User).
+- المحتوى: Dashboard إحصائيات + إدارة منتجات (إضافة/تعديل/حذف bilingual) + طلبات (تغيير حالة — الإلغاء بيرجّع الستوك) + عملاء.
+- إنشاء/تغيير أدمن: `npx tsx scripts/create-admin.ts <email> <password> [name]`
+- دومين الأدمن عبر Cloudflare Tunnel: وجّه الـ hostname على بورت التطبيق (مثلاً `http://localhost:3100`) — `proxy.ts` بيحوّل جذر أي دومين بادئ بـ `orionadmin.` على `/admin` تلقائياً.
+
 ## المزايا
 
 - 🏠 رئيسية بستايل أمازون: Hero + كروت فئات + صفوف (الأكثر مبيعاً / عروض النهارده / وصل حديثاً)

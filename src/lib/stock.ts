@@ -8,6 +8,7 @@ import {
   SHIPPING_FEE,
   FREE_SHIPPING_THRESHOLD,
   type PaymentMethodType,
+  type OrderStatusType,
 } from "./constants";
 import type { Prisma } from "@prisma/client";
 
@@ -189,6 +190,37 @@ export async function releaseExpiredReservations(): Promise<number> {
     });
   }
   return released;
+}
+
+/**
+ * تغيير حالة الطلب من لوحة الأدمن.
+ * - الإلغاء بيرجّع الستوك (بنفس حماية الإلغاء المزدوج).
+ * - ممنوع الرجوع من CANCELLED/EXPIRED لأي حالة تانية (كان هيحتاج خصم ستوك تاني).
+ */
+export async function adminUpdateOrderStatus(
+  orderId: string,
+  status: OrderStatusType,
+): Promise<boolean> {
+  if (status === OrderStatus.CANCELLED) {
+    return prisma.$transaction(async (tx) => {
+      const res = await tx.order.updateMany({
+        where: { id: orderId, status: { in: CANCELLABLE_STATUSES } },
+        data: { status: OrderStatus.CANCELLED },
+      });
+      if (res.count === 0) return false;
+      await restockOrderItems(tx, orderId);
+      return true;
+    });
+  }
+
+  const res = await prisma.order.updateMany({
+    where: {
+      id: orderId,
+      status: { notIn: [OrderStatus.CANCELLED, OrderStatus.EXPIRED] },
+    },
+    data: { status, ...(status !== OrderStatus.PENDING_PAYMENT ? { reservedUntil: null } : {}) },
+  });
+  return res.count === 1;
 }
 
 /** تأكيد الدفع (يستخدم من webhook بوابة الدفع لاحقاً) */

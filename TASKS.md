@@ -70,6 +70,16 @@
 - [x] README.md نهائي (تشغيل + مفاتيح OAuth/Paymob + عدالة الستوك + نشر)
 - [x] مستخدم تجريبي: test@orion.dev / test12345
 
+## Phase 4 — لوحة الأدمن ✅ (2026-06-10)
+- [x] عمود `role` في User (customer | admin) + تمريره في JWT/session
+- [x] `scripts/create-admin.ts` — إنشاء/تحديث أدمن من الترمينال + أدمن فعلي اتعمل (admin@orion.shop)
+- [x] `/admin` (تحت [locale]): Dashboard (إحصائيات + ستوك منخفض + أحدث طلبات) + المنتجات (إضافة/تعديل/حذف bilingual) + الطلبات (تغيير الحالة، والإلغاء بيرجّع الستوك) + العملاء
+- [x] APIs محمية بـ `getAdminSession()`: `/api/admin/products` + `[id]` + `/api/admin/orders/[id]`
+- [x] `proxy.ts`: دومين `orionadmin.*` بيوجّه الجذر لـ `/admin` مباشرة
+- [x] 🔒 سد تسريب RSC payload: حارس أدمن جوه كل صفحة (مش الـ layout بس) — متأكد بالاختبار
+- [x] اختبارات: أدمن يدخل ويشوف الداشبورد (EN+AR) / عميل عادي Access denied من غير داتا / عميل على API أدمن ⇒ 403 / إنشاء وحذف منتج من API الأدمن ✓
+- [x] إيقاف تعريض Prisma Studio على التانل (الأدمن الجديد بديله)
+
 ## خطوات جاية (اختيارية)
 - [ ] مفاتيح OAuth حقيقية (Google/Facebook/Apple) + مفاتيح Paymob + webhook لتأكيد الدفع (`markOrderPaid` جاهزة في lib/stock)
 - [ ] نشر على VPS خلف Cloudflare + PostgreSQL + cron لتحرير الحجوزات
