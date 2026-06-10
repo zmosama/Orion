@@ -21,6 +21,18 @@
       "rating": "تقييم العملاء"
     }
   },
+  "filters": {
+    "title": "الفلاتر",
+    "clear": "مسح الكل",
+    "inStockOnly": "المتوفر بس",
+    "brand": "الماركة",
+    "price": "السعر (جنيه)",
+    "min": "من",
+    "max": "إلى",
+    "go": "طبّق",
+    "rating": "تقييم العملاء",
+    "andUp": "فأكثر"
+  },
   "search": {
     "results": "{count, plural, zero {لا نتائج} one {نتيجة واحدة} two {نتيجتان} few {# نتائج} many {# نتيجة} other {# نتيجة}} عن \"{query}\"",
     "empty": "مفيش نتائج عن \"{query}\"",

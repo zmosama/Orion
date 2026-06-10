@@ -21,6 +21,18 @@
       "rating": "Avg. customer review"
     }
   },
+  "filters": {
+    "title": "Filters",
+    "clear": "Clear all",
+    "inStockOnly": "In stock only",
+    "brand": "Brand",
+    "price": "Price (EGP)",
+    "min": "Min",
+    "max": "Max",
+    "go": "Go",
+    "rating": "Customer rating",
+    "andUp": "& up"
+  },
   "search": {
     "results": "{count, plural, one {# result} other {# results}} for \"{query}\"",
     "empty": "No results for \"{query}\"",
